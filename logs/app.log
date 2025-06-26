@@ -1,0 +1,49 @@
+2025-05-28 14:30:33,219 - INFO - Starting production server on port 5000
+2025-05-28 14:30:33,226 - INFO - Serving on http://0.0.0.0:5000
+2025-05-28 14:30:34,318 - INFO - Initializing QA system...
+2025-05-28 14:30:38,417 - ERROR - Failed to initialize QA system: Error 10061 connecting to localhost:6379. No connection could be made because the target machine actively refused it.
+2025-05-28 14:30:38,445 - ERROR - Traceback (most recent call last):
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\connection.py", line 385, in connect_check_health
+    sock = self.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\retry.py", line 87, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\connection.py", line 386, in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\connection.py", line 797, in _connect
+    raise err
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\connection.py", line 781, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\home_interface\app.py", line 87, in initialize_qa_system_async
+    if not await processor.initialize_vector_store(pdf_path):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\home_interface\main_qa_module.py", line 130, in initialize_vector_store
+    cached_store = redis_client.get(cache_key)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\commands\core.py", line 1829, in get
+    return self.execute_command("GET", name, keys=[name])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\client.py", line 623, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\client.py", line 629, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\utils.py", line 191, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\connection.py", line 1530, in get_connection
+    connection.connect()
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\connection.py", line 379, in connect
+    self.connect_check_health(check_health=True)
+  File "C:\Users\LENOVO\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\redis\connection.py", line 391, in connect_check_health
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 10061 connecting to localhost:6379. No connection could be made because the target machine actively refused it.
+

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asisten Virtual Skincare</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #e546b5;
+      --secondary: #f8a8d8;
+      --accent: #ffd6f0;
+      --light: #fff9fc;
+      --dark: #3a0e2a;
+    }
+    
+    .hidden { display: none; }
+    .disabled-button {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    /* Product Card */
+    .product-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      width: 220px;
+      margin: 12px;
+      box-shadow: 0 6px 20px rgba(229, 70, 181, 0.12);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      border: 1px solid rgba(229, 70, 181, 0.15);
+    }
+    
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(229, 70, 181, 0.2);
+    }
+    
+    .product-image-container {
+      background: linear-gradient(135deg, #fff9fc 0%, #ffecf7 100%);
+      padding: 15px;
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    
+    .product-card:hover .product-image {
+      transform: scale(1.05);
+    }
+    
+    .product-name {
+      font-size: 15px;
+      font-weight: 600;
+      padding: 12px;
+      color: var(--dark);
+      text-align: center;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .product-footer {
+      padding: 12px 16px 16px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .detail-btn {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 4px 8px rgba(229, 70, 181, 0.2);
+      letter-spacing: 0.5px;
+    }
+    
+    .detail-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(229, 70, 181, 0.3);
+    }
+    
+    /* Chat Container */
+    .chat-container {
+      scrollbar-width: thin;
+      scrollbar-color: var(--secondary) var(--light);
+      background-color: var(--light);
+    }
+    
+    .chat-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .chat-container::-webkit-scrollbar-track {
+      background: var(--light);
+      border-radius: 10px;
+    }
+    
+    .chat-container::-webkit-scrollbar-thumb {
+      background-color: var(--secondary);
+      border-radius: 10px;
+      border: 2px solid var(--light);
+    }
+    
+    /* Message Bubbles */
+    .user-message-bubble {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border-radius: 24px 24px 6px 24px;
+      max-width: 80%;
+      box-shadow: 0 4px 12px rgba(229, 70, 181, 0.15);
+    }
+    
+    .bot-message-bubble {
+      background: white;
+      color: var(--dark);
+      border-radius: 24px 24px 24px 6px;
+      max-width: 80%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    /* Header */
+    .app-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      box-shadow: 0 6px 20px rgba(229, 70, 181, 0.25);
+    }
+    
+    /* Input */
+    .chat-input {
+      background: white;
+      border: 1px solid rgba(229, 70, 181, 0.2);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .chat-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(229, 70, 181, 0.15);
+    }
+    
+    .send-button {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      box-shadow: 0 4px 10px rgba(229, 70, 181, 0.25);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .send-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(229, 70, 181, 0.3);
+    }
+    
+    /* Footer Gradient */
+    .color-gradient-bar {
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+    }
+    
+    /* Typing Indicator */
+    .typing-indicator {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    /* Modal */
+    .product-modal {
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+    }
+    
+    .modal-content {
+      background: white;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+    
+    .modal-image-container {
+      background: linear-gradient(135deg, #fff9fc 0%, #ffecf7 100%);
+    }
+    
+    /* Scroll Buttons */
+    .scroll-button {
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      transform: translateY(20px);
+    }
+    
+    .scroll-button.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 640px) {
+      .input-container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+      
+      .product-card {
+        width: 180px;
+        margin: 8px;
+      }
+      
+      .product-name {
+        font-size: 14px;
+        min-height: 50px;
+      }
+      
+      .detail-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#fff9fc] h-screen flex flex-col font-sans">
+
+  <!-- Header with Gradient -->
+  <header class="app-header text-white p-4">
+    <div class="container mx-auto flex items-center space-x-3">
+      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shadow-sm">
+        <i class="fas fa-spa text-white text-xl"></i>
+      </div>
+      <h1 class="text-white text-2xl font-bold">Asisten Virtual <sup class="text-pink-200">💗</sup></h1>
+    </div>
+  </header>
+  
+  <!-- Chat Container -->
+  <div class="flex-1 overflow-y-auto p-4 chat-container" id="chatContainer">
+    <div class="container mx-auto max-w-3xl space-y-4" id="chatMessages">
+      <!-- Welcome Message -->
+      <div class="flex justify-start">
+        <div class="flex items-end space-x-3">
+          <div class="bot-message-bubble px-5 py-3">
+            <p class="text-gray-800 text-justify">Hello! 👋 Saya asisten rekomendasi skincare. Tanya saya tentang produk facial wash, sunscreen, serum, dan moisturizer yang cocok untuk Anda.</p>
+            <p class="text-gray-800 text-justify"><br />contoh : serum untuk kulit kering, atau manfaat GARNIER SAKURA GLOW GLOWING FACE WASH.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Input Area -->
+  <div class="p-4 input-container bg-white/50 backdrop-blur-sm">
+    <div class="container mx-auto max-w-3xl">
+      <form id="chatForm" class="flex items-center gap-3 w-full">
+        <input id="userInput" 
+               type="text" 
+               placeholder="Ketik pertanyaan tentang produk skincare..." 
+               class="flex-1 p-4 rounded-full chat-input focus:outline-none pl-5 pr-5"
+               autocomplete="off"
+               maxlength="120"/>
+        <button id="submitButton" 
+                type="submit" 
+                class="w-12 h-12 flex-shrink-0 rounded-full send-button text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+          <i id="sendIcon" class="fas fa-paper-plane"></i>
+          <i id="loadingIcon" class="fas fa-spinner fa-spin hidden"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Scroll Up and Down Buttons -->
+  <div class="fixed bottom-8 right-4 flex flex-col gap-2">
+    <button id="scrollUpButton" class="scroll-button p-2 rounded-full bg-[#e546b5] text-white shadow-lg hover:bg-[#f8a8d8]">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <button id="scrollDownButton" class="scroll-button p-2 rounded-full bg-[#e546b5] text-white shadow-lg hover:bg-[#f8a8d8]">
+      <i class="fas fa-arrow-down"></i>
+    </button>
+  </div>
+  
+ <!-- Modal Produk -->
+<div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 product-modal">
+  <div class="modal-content rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 id="modalProductName" class="text-2xl font-bold text-[#3a0e2a]"></h2>
+        <button id="closeModal" class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-1 gap-6">
+        <div class="modal-image-container p-6 rounded-xl">
+          <img id="modalProductImage" src="" alt="Product" class="rounded-lg w-full max-h-64 object-contain mx-auto">
+        </div>
+        
+        <div class="space-y-5">
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Tipe Produk:</span>
+            <p id="modalProductType" class="mt-1 text-gray-700 text-lg"></p>
+          </div>
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Ingredients:</span>
+            <p id="modalIngredients" class="mt-1 text-gray-600 text-sm text-justifyleading-relaxed"></p>
+          </div>
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Deskripsi:</span>
+            <p id="modalDescription" class="mt-1 text-gray-700 text-justify"></p>
+          </div>
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Harga:</span>
+            <p id="modalPrice" class="mt-1 text-xl font-bold text-[#e546b5]"></p>
+          </div>
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Tipe Kulit:</span>
+            <p id="modalSkinType" class="mt-1 text-gray-700 text-lg"></p>
+          </div>
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Manfaat:</span>
+            <p id="modalManfaat" class="mt-1 text-gray-700 text-justifytext-lg"></p>
+          </div>
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Cara Pakai:</span>
+            <p id="modalCaraPakai" class="mt-1 text-gray-700 text-lg text-justify"></p>
+          </div>
+          
+          <!-- Location Section -->
+          <div>
+            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Lokasi:</span>
+            <div class="mt-2">
+              <div class="flex space-x-2 mb-4">
+                <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="0">Lokasi Raodah Beauty</button>
+                <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="1">Lokasi Wcare</button>
+                <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="2">Lokasi FLBeauty</button>
+              </div>
+              <div id="modalLocation" class="w-full h-64 rounded-lg overflow-hidden">
+                <!-- Location iframe will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+  <!-- Color Gradient Bar -->
+  <div class="color-gradient-bar"></div>
+
+  <script>
+    function showProductDetail(productName) {
+      fetch('../static/data.json')
+        .then(response => response.json())
+        .then(products => {
+          const product = products.find(p => p.nama === productName);
+          if (product) {
+            document.getElementById('modalProductName').textContent = product.nama;
+            document.getElementById('modalProductImage').src = `static/data.1/${product.nama}.JPG`;
+            document.getElementById('modalProductType').textContent = product["tipe produk"] || 'N/A';
+            
+            const ingredients = product.ingredients ? 
+              (Array.isArray(product.ingredients) ? product.ingredients.join(', ') : product.ingredients) 
+              : 'N/A';
+            document.getElementById('modalIngredients').textContent = ingredients;
+            
+            document.getElementById('modalDescription').textContent = product.deskripsi || 'N/A';
+            document.getElementById('modalPrice').textContent = product.harga ? `Rp ${product.harga}` : 'N/A';
+            document.getElementById('modalSkinType').textContent = product["tipe kulit"] || 'N/A';
+
+            const locationTabs = document.querySelectorAll('.location-tab');
+            const modalLocation = document.getElementById('modalLocation');
+
+            locationTabs.forEach((tab, index) => {
+              tab.addEventListener('click', () => {
+                const productName = document.getElementById('modalProductName').textContent;
+                fetch('../static/data.json')
+                  .then(response => response.json())
+                  .then(products => {
+                    const product = products.find(p => p.nama === productName);
+                    if (product) {
+                      const iframe = product.lokasi[index];
+                      modalLocation.innerHTML = iframe;
+                    } else {
+                      console.error('Produk tidak ditemukan');
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Error fetching product data:', error);
+                    alert('Terjadi kesalahan saat memuat data produk');
+                  });
+              });
+            });
+            
+            const manfaat = product.manfaat ? 
+              (Array.isArray(product.manfaat) ? product.manfaat.join(', ') : product.manfaat) 
+              : 'N/A';
+            document.getElementById('modalManfaat').textContent = manfaat;
+            
+            document.getElementById('modalCaraPakai').textContent = product.cara_pakai || 'N/A';
+            document.getElementById('productModal').classList.remove('hidden');
+          } else {
+            alert('Produk tidak ditemukan');
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching product data:', error);
+          alert('Terjadi kesalahan saat memuat data produk');
+        });
+    }
+
+    // Add event listener for detail button
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('detail-btn')) {
+        const productName = e.target.dataset.productName;
+        showProductDetail(productName);
+      }
+    });
+
+    // Modal close handlers
+    document.getElementById('closeModal').addEventListener('click', function() {
+      document.getElementById('productModal').classList.add('hidden');
+    });
+
+    document.getElementById('productModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.add('hidden');
+      }
+    });
+
+    // Chat functionality
+    const chatForm = document.getElementById('chatForm');
+    const userInput = document.getElementById('userInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const submitButton = document.getElementById('submitButton');
+    const sendIcon = document.getElementById('sendIcon');
+    const loadingIcon = document.getElementById('loadingIcon');
+    const scrollUpButton = document.getElementById('scrollUpButton');
+    const scrollDownButton = document.getElementById('scrollDownButton');
+    const chatContainer = document.getElementById('chatContainer');
+
+    let isProcessing = false;
+
+    // Animated scroll functions
+    function scrollToBottom() {
+      animateScroll(chatContainer.scrollHeight, 500);
+    }
+
+    function scrollToTop() {
+      animateScroll(0, 500);
+    }
+
+    function scrollUp() {
+      animateScroll(chatContainer.scrollTop - 150, 300);
+    }
+
+    function scrollDown() {
+      animateScroll(chatContainer.scrollTop + 150, 300);
+    }
+
+    function animateScroll(targetPosition, duration) {
+      const startPosition = chatContainer.scrollTop;
+      const distance = targetPosition - startPosition;
+      const startTime = performance.now();
+      
+      function scrollAnimation(currentTime) {
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(elapsedTime / duration, 1);
+        const easeProgress = easeOutCubic(progress);
+        
+        chatContainer.scrollTop = startPosition + (distance * easeProgress);
+        
+        if (progress < 1) {
+          requestAnimationFrame(scrollAnimation);
+        } else {
+          updateScrollButtons();
+        }
+      }
+      
+      requestAnimationFrame(scrollAnimation);
+    }
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function updateScrollButtons() {
+      // Check if there's enough content to scroll
+      const hasScroll = chatContainer.scrollHeight > chatContainer.clientHeight;
+      
+      if (!hasScroll) {
+        scrollUpButton.classList.remove('visible');
+        scrollDownButton.classList.remove('visible');
+        return;
+      }
+      
+      // Check if we're at the top
+      const isAtTop = chatContainer.scrollTop === 0;
+      
+      // Check if we're at the bottom (with a small tolerance)
+      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 10;
+      
+      // Update button visibility with animation
+      scrollUpButton.classList.toggle('visible', !isAtTop);
+      scrollDownButton.classList.toggle('visible', !isAtBottom);
+    }
+
+    // Event listeners for scroll buttons
+    scrollUpButton.addEventListener('click', scrollUp);
+    scrollDownButton.addEventListener('click', scrollDown);
+    
+    // Scroll to top and bottom buttons
+    scrollDownButton.addEventListener('dblclick', scrollToBottom);
+    scrollUpButton.addEventListener('dblclick', scrollToTop);
+
+    // Monitor scroll events
+    chatContainer.addEventListener('scroll', updateScrollButtons);
+    
+    // Adjust input width on resize
+    function adjustInputWidth() {
+      const formWidth = chatForm.offsetWidth;
+      const buttonWidth = submitButton.offsetWidth;
+      const padding = 16;
+      userInput.style.maxWidth = `${formWidth - buttonWidth - padding}px`;
+    }
+
+    // Initial adjustment and on resize
+    window.addEventListener('load', () => {
+      adjustInputWidth();
+      userInput.focus();
+      // Check scroll buttons after a short delay to allow rendering
+      setTimeout(updateScrollButtons, 500);
+    });
+    
+    window.addEventListener('resize', () => {
+      adjustInputWidth();
+      updateScrollButtons();
+    });
+
+    // Form submission
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (isProcessing) return;
+      
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      isProcessing = true;
+      toggleButtonState(true);
+      
+      addMessage(message, 'user');
+      userInput.value = '';
+      addTyping();
+
+      try {
+        const res = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        removeTyping();
+
+        if (data.status === 'success') {
+          if (data.response_type === 'html') {
+            addHtmlMessage(data.response);
+          } else {
+            addMessage(data.response, 'bot');
+          }
+        } else {
+          addMessage('⚠️ ' + data.response, 'bot');
+        }
+      } catch (err) {
+        removeTyping();
+        addMessage('⚠️ Server error, please try again later.', 'bot');
+        console.error(err);
+      } finally {
+        isProcessing = false;
+        toggleButtonState(false);
+        userInput.focus();
+        // Wait for the message to render and then update scroll buttons
+        setTimeout(updateScrollButtons, 100);
+      }
+    });
+
+    function toggleButtonState(processing) {
+      submitButton.disabled = processing;
+      if (processing) {
+        sendIcon.classList.add('hidden');
+        loadingIcon.classList.remove('hidden');
+      } else {
+        loadingIcon.classList.add('hidden');
+        sendIcon.classList.remove('hidden');
+      }
+    }
+
+    function addMessage(msg, sender) {
+      const isUser = sender === 'user';
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex justify-${isUser ? 'end' : 'start'} mb-4`;
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = isUser 
+        ? 'user-message-bubble px-5 py-3'
+        : 'bot-message-bubble px-5 py-3';
+
+      const messageText = document.createElement('p');
+      messageText.className = isUser 
+        ? 'text-white break-words whitespace-pre-wrap'
+        : 'text-gray-800 break-words whitespace-pre-wrap';
+      messageText.textContent = msg;
+
+      // Timestamp
+      const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const timeStamp = document.createElement('p');
+      timeStamp.className = isUser 
+        ? 'text-xs text-white/80 mt-2 text-right' 
+        : 'text-xs text-gray-400 mt-2 text-right';
+      timeStamp.textContent = timestamp;
+
+      messageDiv.appendChild(messageText);
+      messageDiv.appendChild(timeStamp);
+      wrapper.appendChild(messageDiv);
+      chatMessages.appendChild(wrapper);
+      scrollToBottom();
+    }
+
+    function addHtmlMessage(htmlContent) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex justify-start mb-4';
+
+      const content = document.createElement('div');
+      content.className = 'flex items-end space-x-3 w-full';
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'flex-1 bot-message-bubble px-5 py-3';
+      messageDiv.innerHTML = htmlContent;
+
+      const timestamp = document.createElement('p');
+      timestamp.className = 'text-xs text-gray-400 mt-2 text-right';
+      timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      messageDiv.appendChild(timestamp);
+
+      content.appendChild(messageDiv);
+      wrapper.appendChild(content);
+      chatMessages.appendChild(wrapper);
+
+      scrollToBottom();
+    }
+
+    function addTyping() {
+      const typing = document.createElement('div');
+      typing.id = 'typingIndicator';
+      typing.className = 'flex justify-start mb-4';
+
+      typing.innerHTML = ` 
+        <div class="flex items-end space-x-3 w-full">
+          <div class="typing-indicator px-5 py-3">
+            <div class="flex space-x-2 items-center">
+              <div class="w-2 h-2 rounded-full bg-[#e546b5] animate-bounce"></div>
+              <div class="w-2 h-2 rounded-full bg-[#f8a8d8] animate-bounce" style="animation-delay: .2s"></div>
+              <div class="w-2 h-2 rounded-full bg-[#ffd6f0] animate-bounce" style="animation-delay: .4s"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      chatMessages.appendChild(typing);
+      scrollToBottom();
+    }
+
+    function removeTyping() {
+      const typing = document.getElementById('typingIndicator');
+      if (typing) typing.remove();
+    }
+
+    // Allow sending with Enter key
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        chatForm.dispatchEvent(new Event('submit'));
+      }
+    });
+  </script>
+</body>
+</html>
