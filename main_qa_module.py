@@ -15,6 +15,7 @@ from transformers import BertTokenizer, BertModel
 import torch
 from scipy.spatial.distance import cosine
 import tiktoken
+from urllib.parse import quote
 
 # ======================
 # LOGGING CONFIGURATION
@@ -66,8 +67,9 @@ SKIN_SYNONYMS = {
 # Pemisah untuk jenis kulit kombinasi
 SKIN_TYPE_SEPARATORS = ['/', 'dan', '&', 'serta', '-', 'atau', '+']
 
-PRODUCT_TYPES = ["facial wash", "cleanser", "pelembap", "moisturizer", 
-                "sunscreen", "tabir surya", "serum", "toner"]
+# Hanya produk ini yang didukung
+SUPPORTED_PRODUCT_TYPES = ["facial wash", "cleanser", "pelembap", "moisturizer", 
+                           "sunscreen", "tabir surya", "serum"]
 PRODUCT_SYNONYMS = {
     'cuci muka': 'facial wash',
     'pembersih': 'cleanser',
@@ -201,7 +203,7 @@ def fuzzy_match(input_str, options, threshold=0.7, get_all=False):
     return None
 
 # ======================
-# CONVERSATION CONTEXT (Dukungan Jenis Kulit Kombinasi)
+# CONVERSATION CONTEXT (Perbaikan)
 # ======================
 class ConversationContext:
     def __init__(self, product_names: List[str] = None):
@@ -220,7 +222,9 @@ class ConversationContext:
         self.ingredient_filter = None  # Filter kandungan
         self.price_filter = None  # Filter harga
         self.context_maintained = False  # Menandai apakah konteks dipertahankan
-        
+        self.recommended_products = set()  # Produk yang sudah direkomendasikan
+        self.recommendation_context = ""   # Konteks rekomendasi terakhir
+        self.need_reset_filters = False
         if product_names:
             for name in product_names:
                 self.add_product(name)
@@ -235,9 +239,10 @@ class ConversationContext:
         return self.skin_type
 
     def update(self, question: str, response: str):
+        if 'rekomendasi lainnya' not in question.lower():
+            self.need_reset_filters = True
         self.last_question = question
         self._extract_context(question, response)
-    
     def _detect_question_type(self, question: str) -> str:
         q_lower = question.lower()
         
@@ -254,15 +259,16 @@ class ConversationContext:
     def _extract_context(self, question: str, response: str):
         self.need_skin_type = False
         self.need_product_type = False
-        self.requested_count = None
-        self.ingredient_filter = None
-        self.price_filter = None
         self.context_maintained = False
+        
+        # Simpan nilai sebelumnya untuk perbandingan
+        old_skin_type = self.skin_type.copy() if self.skin_type else []
+        old_product_type = self.product_type
         
         # Ekstrak jenis kulit dari pertanyaan
         new_skin_types = self._extract_skin_type(question)
         
-        # Pertahankan konteks sebelumnya jika tidak ada jenis kulit baru
+        # PERBAIKAN: Gunakan new_skin_types jika ada, jika tidak gunakan yang lama
         if new_skin_types:
             self.skin_type = new_skin_types
             logger.info(f"Updated skin types: {self.skin_type}")
@@ -273,12 +279,34 @@ class ConversationContext:
         # Ekstrak tipe produk
         self._extract_product_type(question)
         
+        # Periksa perubahan kriteria utama
+        skin_changed = (
+            (old_skin_type != self.skin_type) and  # PERBAIKAN: perbandingan langsung
+            (self.skin_type is not None)
+        )
+        product_type_changed = old_product_type != self.product_type
+        
+        # Reset filter jika ada perubahan jenis kulit atau tipe produk
+        if skin_changed or product_type_changed:
+            self.ingredient_filter = None
+            self.price_filter = None
+            logger.info("Reset filters due to criteria change")
+        
         # Ekstrak nama produk
         extracted_product = self._extract_product_name(question) or self._extract_product_name(response)
         if extracted_product:
             self.last_product = extracted_product
             logger.info(f"Detected product: {self.last_product}")
             
+        # Reset rekomendasi jika ada perubahan signifikan pada kriteria
+        if skin_changed or product_type_changed:
+            self.recommended_products = set()
+            self.recommendation_context = ""
+            logger.info("Reset recommended products due to criteria change")
+        else:
+            self.context_maintained = True
+            logger.info("Maintaining recommendation context for filters")
+    
     def _extract_skin_type(self, question: str):
         q_lower = question.lower()
         detected_skins = set()
@@ -309,11 +337,11 @@ class ConversationContext:
             words = re.findall(r'\b\w+\b', q_lower)
             for word in words:
                 # Skip kata-kata pendek yang tidak relevan
-                if len(word) < 4:
+                if len(word) < 5:
                     continue
                     
                 # Fuzzy match dengan threshold rendah
-                match = fuzzy_match(word, SKIN_TYPES, threshold=0.6)
+                match = fuzzy_match(word, SKIN_TYPES, threshold=0.8)
                 if match:
                     detected_skins.add(match)
                     logger.info(f"Fuzzy matched skin type: '{word}' -> '{match}'")
@@ -323,12 +351,21 @@ class ConversationContext:
             for separator in SKIN_TYPE_SEPARATORS:
                 parts = [p.strip() for p in q_lower.split(separator)]
                 for part in parts:
-                    # Coba cocokkan setiap bagian dengan jenis kulit
-                    match = fuzzy_match(part, SKIN_TYPES, threshold=0.65)
+                    if len(part) < 5:
+                        continue
+                    match = fuzzy_match(part, SKIN_TYPES, threshold=0.8)
                     if match:
                         detected_skins.add(match)
         
-        return list(detected_skins) if detected_skins else None
+        # 5. Pastikan hanya jenis kulit yang valid
+        valid_skins = set(SKIN_TYPES)
+        detected_skins = {s for s in detected_skins if s in valid_skins}
+        
+        # PERBAIKAN: Return None jika tidak ditemukan jenis kulit baru
+        if not detected_skins:
+            return None
+        
+        return list(detected_skins)
 
     def _extract_product_type(self, question: str):
         # Cari sinonim terlebih dahulu
@@ -344,8 +381,7 @@ class ConversationContext:
             'sunscreen': r'\b(sunscreen|tabir surya|sunblock)\b',
             'moisturizer': r'\b(moisturizer|pelembap)\b',
             'cleanser': r'\b(cleanser|facial wash|cuci muka|pembersih)\b',
-            'serum': r'\b(serum|essence)\b',
-            'toner': r'\b(toner)\b'
+            'serum': r'\b(serum|essence)\b'
         }
         
         for product_type, pattern in product_patterns.items():
@@ -355,14 +391,14 @@ class ConversationContext:
                 return
                 
         # Cari eksak di daftar product type
-        for pt in PRODUCT_TYPES:
+        for pt in SUPPORTED_PRODUCT_TYPES:
             if pt in q_lower:
                 self.product_type = pt
                 logger.info(f"Detected product type: {self.product_type}")
                 return
         
         # Fuzzy matching fallback
-        match = fuzzy_match(q_lower, PRODUCT_TYPES, threshold=0.7)
+        match = fuzzy_match(q_lower, SUPPORTED_PRODUCT_TYPES, threshold=0.7)
         if match:
             self.product_type = match
             logger.info(f"Fuzzy matched product type: {self.product_type}")
@@ -412,7 +448,7 @@ class ConversationContext:
         return self.last_info_types
 
 # ======================
-# PDF PROCESSOR (Dukungan Jenis Kulit Kombinasi)
+# PDF PROCESSOR
 # ======================
 class PDFProcessor:
     def __init__(self):
@@ -544,9 +580,7 @@ class PDFProcessor:
                     'sunscreen': ['sunscreen', 'tabir surya', 'sunblock'],
                     'moisturizer': ['moisturizer', 'pelembap'],
                     'cleanser': ['cleanser', 'facial wash', 'pembersih'],
-                    'serum': ['serum', 'essence'],
-                    'toner': ['toner'],
-                    'masker': ['masker', 'mask']
+                    'serum': ['serum', 'essence']
                 }
                 
                 normalized_type = 'lain'
@@ -731,7 +765,7 @@ class PDFProcessor:
                     batch_size = max(10, batch_size // 2)
 
 # ======================
-# QA ENGINE (Dukungan Jenis Kulit Kombinasi)
+# QA ENGINE
 # ======================
 class QAEngine:
     def __init__(self, vector_store, processor: PDFProcessor):
@@ -746,16 +780,19 @@ class QAEngine:
         self.bertscorer = BERTScorer()
         self.evaluation_results = []
         
+
     def _generate_product_cards(self, products: List[Dict]) -> str:
         cards = []
         for product in products:
             name = product['name']
-            # Gunakan nama asli tanpa normalisasi untuk ditampilkan
+            
+            # Encode khusus untuk nama file gambar (ganti % dengan %25)
+            image_name = name.replace('%', '%25')  # Hanya encoding khusus untuk %
+            
             card = f"""
             <div class="product-card">
                 <div class="product-image-container">
-                    <img src="../static/data.1/{name}.jpg" alt="{name}" class="product-image" 
-                         onerror="this.onerror=null; this.src='../static/default_product.jpg';">
+                    <img src="../static/data.1/{image_name}.jpg" alt="{name}" class="product-image">
                 </div>
                 <div class="product-info">
                     <h3 class="product-name">{name}</h3>
@@ -780,6 +817,38 @@ class QAEngine:
                 info_types.append(q_type)
                 
         return info_types
+
+    def _extract_filters(self, question: str):
+        """Ekstrak filter dari pertanyaan (kandungan, harga, jumlah)"""
+        q_lower = question.lower()
+        
+        # Deteksi filter kandungan
+        ingredient_match = re.search(r'(mengandung|dengan kandungan|kandungan)\s+([\w\s]+)', q_lower)
+        if ingredient_match:
+            self.context.ingredient_filter = ingredient_match.group(2).strip()
+            logger.info(f"Extracted ingredient filter: {self.context.ingredient_filter}")
+        
+        # Deteksi filter harga
+        price_match = re.search(
+            r'(harga\s+)?(dibawah|di bawah|di atas|diatas|kurang|lebih|sampai|hingga|>|<|>=|<=)?\s*([\d\.]+)\s*(ribu|rbu|rb|k)?', 
+            q_lower
+        )
+        if price_match:
+            operator = price_match.group(2).lower() if price_match.group(2) else ""
+            price_value = float(price_match.group(3).replace('.', ''))
+            
+            # Handle satuan ribu (100rb = 100000)
+            if price_match.group(4) and price_match.group(4) in ['ribu', 'rbu', 'rb', 'k']:
+                price_value *= 1000
+                
+            self.context.price_filter = (operator, price_value)
+            logger.info(f"Extracted price filter: {operator} {price_value}")
+        
+        # Deteksi jumlah produk
+        num_match = re.search(r'(\d+)\s+produk', q_lower)
+        if num_match:
+            self.context.requested_count = int(num_match.group(1))
+            logger.info(f"Extracted requested count: {self.context.requested_count}")
 
     def _guess_product_name(self, question: str, product_name: str = "") -> Optional[str]:
         """Use GPT to guess product name from incomplete names using document context"""
@@ -857,137 +926,119 @@ class QAEngine:
         """Mengembalikan (question_type, product, info_types)"""
         info_types = []
         q_lower = question.lower()
-        
+
+        # 1. Handle pertanyaan kosong atau tidak valid
         if not question.strip() or re.fullmatch(r'[\s\?\*\{\}]+', question):
             return ("invalid", None, [])
-            
-        # Handle special cases
+        
+        # 2. Ekstrak filter dari pertanyaan
+        self._extract_filters(question)
+        
+        # 3. Ekstrak produk SEKARANG untuk digunakan di logika berikutnya
+        product = self._extract_product_from_question(question)
+        
+        # 4. Handle special cases
         if any(greeting in q_lower for greeting in GREETINGS):
-            product = self._extract_product_from_question(question)
             if product:
-                return ("product_info", product, ['manfaat'])  # Kategorikan sebagai informasi produk
+                return ("product_info", product, ['manfaat'])
             return ("sapaan", None, [])
-            
-        # Deteksi khusus untuk pertanyaan manfaat
+        
+        # 5. Deteksi rekomendasi lainnya (follow-up)
+        rekomendasi_lain_keywords = ['rekomendasi lainnya', 'rekomendasi lain', 'lainnya', 'selanjutnya', 'lagi']
+        if any(kw in q_lower for kw in rekomendasi_lain_keywords):
+            return ("rekomendasi_lain", None, [])
+        
+        # 6. Gunakan GPT untuk klasifikasi pertanyaan
+        classification = self._classify_question_with_gpt(question)
+        logger.info(f"GPT classification: {classification}")
+        
+        # 7. Deteksi info_types
         product_info_keywords = {
-        'manfaat': ['manfaat', 'kegunaan', 'guna', 'fungsi', 'untuk apa', 'guna nya'],
-        'kandungan': ['kandungan', 'ingredient', 'komposisi', 'bahan', 'isi', 'content'],
-        'cara_pakai': ['cara pakai', 'cara penggunaan', 'penggunaan', 'pemakaian', 'pemakaian', 'bagaimana pakai', 'instruksi'],
-        'harga': ['harga', 'price', 'berapa harga', 'berapa price', 'biaya', 'cost'],
-        'lokasi': ['lokasi', 'tempat beli', 'beli dimana', 'tempat pembelian', 'dijual dimana', 'pembelian', 'outlet']
-    }
-    
-    # Cek apakah ada kata kunci spesifik dan ada nama produk dalam pertanyaan
+            'manfaat': ['manfaat', 'kegunaan', 'guna', 'fungsi', 'untuk apa', 'guna nya'],
+            'kandungan': ['kandungan', 'ingredient', 'komposisi', 'bahan', 'isi', 'content'],
+            'cara_pakai': ['cara pakai', 'cara penggunaan', 'penggunaan', 'pemakaian', 'bagaimana pakai', 'instruksi'],
+            'harga': ['harga', 'price', 'berapa harga', 'berapa price', 'biaya', 'cost'],
+            'lokasi': ['lokasi', 'tempat beli', 'beli dimana', 'tempat pembelian', 'dijual dimana', 'pembelian', 'outlet']
+        }
+        
         detected_info_types = []
         for info_type, keywords in product_info_keywords.items():
             if any(kw in q_lower for kw in keywords):
                 detected_info_types.append(info_type)
         
-        # Jika ada kata kunci spesifik dan ada nama produk
-        if detected_info_types:
-            product = self._extract_product_from_question(question)
-            if product:
-                return ("product_info", product, detected_info_types)
-            
-        # Rekomendasi detection with filters
-        rekomendasi_keywords = QUESTION_TYPES['rekomendasi'] + ['rekomendasi', 'sarankan', 'anjuran']
-        if any(kw in q_lower for kw in rekomendasi_keywords):
-            # Deteksi jumlah produk yang diminta
-            num_match = re.search(r'(\d+)\s+produk', q_lower)
-            self.context.requested_count = int(num_match.group(1)) if num_match else None
-            
-            # Deteksi filter kandungan
-            self.context.ingredient_filter = None
-            ingredient_match = re.search(r'mengandung\s+([\w\s]+)', q_lower)
-            if ingredient_match:
-                self.context.ingredient_filter = ingredient_match.group(1).strip()
-                
-            # Deteksi filter harga
-            self.context.price_filter = None
-            price_match = re.search(r'harga\s+(dibawah|di bawah|di atas|diatas|kurang|lebih|>|<|>=|<=)?\s*([\d\.]+)', q_lower)
-            if price_match:
-                operator = price_match.group(1).lower() if price_match.group(1) else ""
-                price_value = float(price_match.group(2).replace('.', ''))
-                self.context.price_filter = (operator, price_value)
-                
+        # 8. Prioritaskan rekomendasi jika GPT mengklasifikasikan sebagai rekomendasi
+        if classification == "rekomendasi":
             return ("rekomendasi", None, [])
-            
-        # Skin type detection
+        
+        # 9. Handle product_info jika ada info_types dan produk
+        if detected_info_types:
+            if product:
+                # Periksa apakah produk benar-benar produk spesifik atau hanya tipe produk
+                if product.lower() in SUPPORTED_PRODUCT_TYPES:
+                    # Ini sebenarnya tipe produk, bukan produk spesifik
+                    return ("rekomendasi", None, [])
+                return ("product_info", product, detected_info_types)
+            elif self.context.last_product:
+                return ("product_info", self.context.last_product, detected_info_types)
+        
+        # 10. Deteksi jenis kulit
         skin_match = next((skin for skin in SKIN_TYPES if skin in q_lower), None)
         if skin_match:
             if not self.context.skin_type:
                 self.context.skin_type = []
             self.context.skin_type.append(skin_match)
             
-            # PERBAIKAN: Jika hanya menyebutkan jenis kulit, gunakan product_type dari konteks sebelumnya
             if self.context.product_type:
                 return ("rekomendasi", None, [])
             return ("need_product_type", None, [])
-            
-        # PERBAIKAN UTAMA: Deteksi jika user hanya menyebutkan sinonim jenis kulit
-        skin_synonym_detected = False
-        for syn, skin in SKIN_SYNONYMS.items():
-            if re.search(rf'\b{syn}\b', q_lower):
-                if not self.context.skin_type:
-                    self.context.skin_type = []
-                self.context.skin_type.append(skin)
-                skin_synonym_detected = True
-                logger.info(f"Mapped skin synonym: '{syn}' -> '{skin}'")
         
-        # PERBAIKAN: Jika hanya menyebutkan sinonim jenis kulit
-        if skin_synonym_detected:
-            # Gunakan product_type dari konteks sebelumnya jika ada
-            if self.context.product_type:
-                return ("rekomendasi", None, [])
-            return ("need_product_type", None, [])
-            
-        # PERBAIKAN: Deteksi jika dalam pertanyaan terdapat sinonim jenis kulit dan produk
-        has_skin_type = False
-        has_product_type = False
-        
-        # Cek skin type dari sinonim
-        for syn, skin in SKIN_SYNONYMS.items():
-            if re.search(rf'\b{syn}\b', q_lower):
-                if not self.context.skin_type:
-                    self.context.skin_type = []
-                self.context.skin_type.append(skin)
-                has_skin_type = True
-                logger.info(f"Mapped skin synonym: '{syn}' -> '{skin}'")
-        
-        # Cek product type dari sinonim
-        for syn, pt in PRODUCT_SYNONYMS.items():
-            if syn in q_lower:
-                self.context.product_type = pt
-                has_product_type = True
-                break
-        
-        # Jika ditemukan keduanya, maka dianggap permintaan rekomendasi
-        if has_skin_type and has_product_type:
-            return ("rekomendasi", None, [])
-            
-        # Product type detection
-        product_match = next((pt for pt in PRODUCT_TYPES if pt in q_lower), None)
-        if product_match:
-            self.context.product_type = product_match
-            return ("need_skin_type", None, []) if not self.context.skin_type else ("rekomendasi", None, [])
-            
-        # Handle all product info questions with unified approach
-        # Extract info types from question
-        info_types = self._extract_info_types(question)
-        product = self._extract_product_from_question(question)
-        
-        if product and not info_types:
-            # Hanya menyebutkan nama produk tanpa info spesifik
+        # 11. Handle product_card jika hanya menyebut produk
+        if product and not detected_info_types:
             return ("product_card", product, [])
-        elif info_types:
-            return ("product_info", product or self.context.last_product, info_types)
-                
+        
+        # 12. Fallback ke hasil klasifikasi GPT
+        if classification == "product_info":
+            if product:
+                return ("product_info", product, ['manfaat'])
+            elif self.context.last_product:
+                return ("product_info", self.context.last_product, ['manfaat'])
+        
         return ("general", None, [])
 
+    def _classify_question_with_gpt(self, question: str) -> str:
+        """Klasifikasikan pertanyaan menggunakan GPT"""
+        prompt = f"""
+        Anda adalah asisten yang membantu mengklasifikasikan pertanyaan tentang skincare.
+        Pertanyaan: "{question}"
+        
+        Klasifikasikan pertanyaan ini ke dalam salah satu kategori berikut:
+        1. "rekomendasi" - jika pengguna meminta rekomendasi produk berdasarkan kriteria
+        2. "product_info" - jika pengguna menanyakan informasi tentang produk tertentu
+        
+        Pertimbangkan:
+        - Jika pertanyaan mengandung kata kunci seperti 'rekomendasi', 'sarankan', 'untuk kulit [jenis]', 
+        'dengan kriteria', atau meminta saran produk -> "rekomendasi"
+        - Jika pertanyaan menyebut nama produk spesifik dan menanyakan detail seperti manfaat, kandungan, harga -> "product_info"
+        - Jika tidak ada petunjuk yang jelas, kembalikan "unknown"
+        
+        Jawab HANYA dengan salah satu dari: "rekomendasi", "product_info", "unknown"
+        """
+        
+        try:
+            response = self.llm.invoke(prompt).content.strip().lower()
+            if "rekomendasi" in response:
+                return "rekomendasi"
+            elif "product_info" in response or "produk" in response:
+                return "product_info"
+            return "unknown"
+        except Exception as e:
+            logger.error(f"GPT classification error: {e}")
+            return "unknown"
+        
     def _extract_product_from_question(self, question: str) -> Optional[str]:
         # Pola regex untuk nama produk uppercase dengan tanda kurung
         patterns = [
-            r'Produk:\s*([^\n]+?)(?=\n|$)',  # Tangkap sampai akhir baris
+            r'Produk:\s*([^\n]+?)(?=\n|$)', # Tangkap sampai akhir baris
             r'\[([^\]]+)\]',
             r'"(.*?)"',
             r'Rekomendasi:\s*(.*?)\n',
@@ -996,7 +1047,7 @@ class QAEngine:
         
         # Coba ekstrak dengan pola regex
         for pattern in patterns:
-            matches = re.findall(pattern, question)
+            matches = re.findall(pattern, question, re.IGNORECASE)
             for match in matches:
                 name = match[0] if isinstance(match, tuple) else match
                 name = name.strip()
@@ -1023,10 +1074,14 @@ class QAEngine:
     def get_recommendations(self, query: str) -> str:
         try:
             # Dapatkan semua produk yang tersedia
+            if 'rekomendasi lainnya' in query.lower():
+                # Preserve existing filters (ingredient, price, etc.)
+                logger.info(f"Maintaining filters for follow-up recommendations: {self.context.ingredient_filter}, {self.context.price_filter}")
+                self.context.need_reset_filters = False  # Don't reset the filters here
             all_products = []
             for product_name in self.context.all_products:
                 product_data = self.processor.get_product_data(product_name)
-                if product_data:
+                if product_data and product_data.get('type_produk') in SUPPORTED_PRODUCT_TYPES:
                     all_products.append({
                         'name': product_name,  # Gunakan nama asli
                         'data': product_data
@@ -1034,10 +1089,10 @@ class QAEngine:
             
             # Log untuk debugging
             logger.info(f"Jumlah produk tersedia: {len(all_products)}")
-            logger.info(f"Kriteria filter - Kulit: {self.context.skin_type}, Produk: {self.context.product_type}")
+            logger.info(f"Kriteria filter - Kulit: {self.context.skin_type}, Produk: {self.context.product_type}, Kandungan: {self.context.ingredient_filter}, Harga: {self.context.price_filter}")
             
             # Normalisasi jenis kulit yang diminta user
-            user_skins = [SKIN_SYNONYMS.get(st.lower(), st.lower()) for st in self.context.skin_type]
+            user_skins = [SKIN_SYNONYMS.get(st.lower(), st.lower()) for st in self.context.skin_type] if self.context.skin_type else []
             logger.info(f"Normalized skin types: {user_skins}")
             
             # Filter produk berdasarkan kriteria
@@ -1045,6 +1100,10 @@ class QAEngine:
             for product in all_products:
                 skin_data = [s.lower() for s in product['data'].get('jenis_kulit', [])]
                 type_data = product['data'].get('type_produk', '').lower()
+                
+                # Skip produk yang jenisnya tidak didukung
+                if type_data not in SUPPORTED_PRODUCT_TYPES:
+                    continue
                 
                 # Logika filter jenis kulit untuk kombinasi
                 skin_match = False
@@ -1076,33 +1135,57 @@ class QAEngine:
                             product_match = True
                             break
                 
-                # Filter kandungan
+                # Filter kandungan - PERBAIKAN UTAMA: gunakan pencocokan substring
                 ingredient_match = True
                 if self.context.ingredient_filter:
                     kandungan = product['data'].get('kandungan', '').lower()
-                    ingredient_match = (self.context.ingredient_filter.lower() in kandungan)
+                    # Pisahkan menjadi kata-kata individual
+                    ingredient_words = self.context.ingredient_filter.lower().split()
+                    # Cek apakah semua kata ada dalam kandungan
+                    ingredient_match = all(word in kandungan for word in ingredient_words)
                     
                 # Filter harga
                 price_match = True
                 if self.context.price_filter:
                     harga_text = product['data'].get('harga', '0')
                     try:
-                        # Ekstrak angka dari teks harga
-                        harga = float(re.search(r'[\d,\.]+', harga_text.replace('.', '')).group().replace(',', '.'))
+                        # Ekstrak angka dari teks harga (dukungan format Rp 100.000 dan 100000)
+                        harga_str = re.search(r'[\d,\.]+', harga_text.replace('.', '')).group().replace(',', '')
+                        harga = float(harga_str)
                     except:
-                        harga = 0
+                        harga = float('inf')  # Tidak bisa diparsing, anggap mahal
                         
                     operator, value = self.context.price_filter
                     if operator in ["dibawah", "di bawah", "kurang", "<"]:
                         price_match = harga < value
                     elif operator in ["di atas", "diatas", "lebih", ">"]:
                         price_match = harga > value
-                    else:
-                        price_match = harga == value  # Default: harga tepat
+                    elif operator in ["sampai", "hingga", "-"]:
+                        price_match = harga <= value
+                    else:  # Default: harga tepat (tidak ada operator)
+                        price_match = harga == value
                 
                 if skin_match and product_match and ingredient_match and price_match:
                     filtered_products.append(product)
                     logger.info(f"Product matched: {product['name']} | Skin: {skin_data} | Type: {type_data}")
+            
+            # Buat kunci konteks baru
+            new_context_key = (
+                f"{','.join(sorted(user_skins))}-"
+                f"{self.context.product_type}-"
+                f"{self.context.ingredient_filter}-"
+                f"{str(self.context.price_filter)}"
+            )
+            
+            # Reset hanya jika ada perubahan signifikan
+            if new_context_key != self.context.recommendation_context:
+                self.context.recommended_products = set()
+                self.context.recommendation_context = new_context_key
+                logger.info(f"New recommendation context: {new_context_key}")
+            
+            # Filter produk yang belum direkomendasikan
+            filtered_products = [p for p in filtered_products 
+                                if p['name'] not in self.context.recommended_products]
             
             # Batasi jumlah produk jika diminta
             requested_count = self.context.requested_count or 5
@@ -1114,18 +1197,114 @@ class QAEngine:
             products_to_show = [{'name': p['name']} for p in filtered_products]
             product_cards = self._generate_product_cards(products_to_show)
             
+            # =============================================================
+            # NEW RAG-BASED INTERACTIVE TEXT GENERATION
+            # =============================================================
+            rag_response = f""" """
+            if filtered_products:
+                # Build context description
+                context_desc = []
+                if user_skins:
+                    skin_str = ", ".join(user_skins)
+                    context_desc.append(f"kulit <span class='highlight'>{skin_str}</span>")
+                if self.context.product_type:
+                    context_desc.append(f"tipe produk <span class='highlight'>{self.context.product_type}</span>")
+                if self.context.ingredient_filter:
+                    context_desc.append(f"mengandung <span class='highlight'>{self.context.ingredient_filter}</span>")
+                if self.context.price_filter:
+                    operator, value = self.context.price_filter
+                    value_str = f"Rp {value:,.0f}".replace(",", ".")
+                    if operator in ['dibawah', 'di bawah', '<']:
+                        context_desc.append(f"harga di bawah <span class='highlight'>{value_str}</span>")
+                    elif operator in ['di atas', 'diatas', '>']:
+                        context_desc.append(f"harga di atas <span class='highlight'>{value_str}</span>")
+                    else:
+                        context_desc.append(f"harga sekitar <span class='highlight'>{value_str}</span>")
+                
+                context_str = ", ".join(context_desc) if context_desc else "berbagai kriteria"
+                
+                # Get top 3 product names
+                top_products = [p['name'].lower() for p in filtered_products[:3]]
+                
+                # Generate personalized message using LLM
+                prompt = f"""
+                Anda adalah asisten skincare yang ramah dan interaktif. Buatlah respons untuk rekomendasi produk dengan:
+                - Konteks: {context_str}
+                - Jumlah produk: {len(filtered_products)}
+                - Produk teratas: {', '.join(top_products)}
+                
+                Struktur respons:
+                Penjelasan singkat mengapa produk ini cocok dengan kriteria dan Ajakan untuk melihat detail produk
+                
+                Gunakan maksimal 3 kalimat. Format dalam HTML sederhana tanpa heading.
+                """
+                
+                try:
+                    rag_text = self.llm.invoke(prompt).content
+                    rag_response = f"""
+                    <div class="rag-response">
+                        {rag_text}
+                    </div>
+                    """
+                except Exception as e:
+                    logger.error(f"RAG text generation error: {e}")
+                    rag_response = f"""
+                    <div class="rag-response">
+                        <p>Saya menemukan {len(filtered_products)} produk yang cocok untuk {context_str}.</p>
+                        <p>Produk-produk ini dipilih berdasarkan kecocokan dengan kebutuhan kulit Anda.</p>
+                    </div>
+                    """
+            else:
+                rag_response = """
+                <div class="rag-response">
+                    <h5>Tidak Ada Lagi Produk Yang Relevan <i class="sad-icon fas fa-frown"></i></h5>
+                <p>Maaf, saya tidak menemukan produk yang sesuai dengan kriteria Anda.</p>
+                </div>
+                """
+            
+            # Simpan produk yang direkomendasikan
+            for p in filtered_products:
+                self.context.recommended_products.add(p['name'])
+            
             # Response dengan jumlah produk aktual
             if filtered_products:
                 response_html = f"""
-                <div class="recommendation-container">
-                    <h3>Ditemukan {len(filtered_products)} produk yang sesuai:</h3>
-                    <div class="product-grid" style="display: flex; flex-wrap: wrap; gap: 20px;">
+                <div class="recommendation-container text-justify">
+                    {rag_response}
+                    <div class="product-grid" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;">
                         {product_cards}
+                    </div>
+                    <div class="recommendation-feedback">
+                        <p>Bagaimana dengan rekomendasi ini?</p>
+                        <div class="feedback-buttons">
+                            <button class="feedback-btn more" data-feedback="more"><i class="fas fa-redo mr-6"></i> Rekomendasi Lainnya</button>
+                        </div>
+                        <p class="feedback-note">Atau jelaskan kebutuhan spesifik Anda untuk rekomendasi lebih akurat</p>
                     </div>
                 </div>
                 """
             else:
-                response_html = "❌ Tidak ditemukan produk yang sesuai. Silakan coba dengan kriteria lain."
+                response_html = f"""
+                <div class="no-recommendation">
+                    {rag_response}
+                <div class="suggestion-box">
+                <ul class="suggestion-list">
+                  <li>
+                    <i class="fa-solid fa-1"></i>
+                    <span class="cursor-pointer suggesst-one">Moisturizer untuk kulit sensitif</span>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-2"></i>
+                    <span class="cursor-pointer suggesst-two">Sunscreen untuk kulit kering dibawah 100 ribu</span>
+                  </li>
+                  <li>
+                    <i class="fa-solid fa-3"></i>
+                    <span class="cursor-pointer suggesst-three">manfaat garnier sakura glow glowing face wash</span>
+                  </li>
+                </ul>
+              </div>
+                </div>
+                """
             
             # Evaluate recommendations
             self._evaluate_recommendation(filtered_products)
@@ -1288,9 +1467,6 @@ class QAEngine:
             
             return f"""
             <div class="product-info-response">
-                <div class="context-info">
-                    {context_info}
-                </div>
                 <div class="info-text">
                     {response_text}
                 </div>
@@ -1522,7 +1698,7 @@ class QAEngine:
             return f"Silakan sebutkan jenis kulit Anda ({'/'.join(SKIN_TYPES)})"
         
         if q_type == "need_product_type":
-            return f"Silakan sebutkan jenis produk yang Anda cari ({'/'.join(PRODUCT_TYPES)})"
+            return f"Silakan sebutkan jenis produk yang Anda cari ({'/'.join(SUPPORTED_PRODUCT_TYPES)})"
         
         # Handle product info requests
         if q_type == "product_info":
@@ -1552,7 +1728,7 @@ class QAEngine:
             return response
         
         # Handle recommendations
-        if q_type == "rekomendasi":
+        if q_type == "rekomendasi" or q_type == "rekomendasi_lain":
             # Gunakan konteks kulit jika ada
             if self.context.skin_type:
                 logger.info(f"Using existing skin type: {self.context.skin_type}")
@@ -1585,7 +1761,7 @@ class QAEngine:
             # Analyze question
             q_type, product, info_types = self.analyze_question(question)
             logger.info(f"Question type: {q_type}, Product: {product}, Info types: {info_types}")
-            logger.info(f"Current context: skin_type={self.context.skin_type}, product_type={self.context.product_type}")
+            logger.info(f"Current context: skin_type={self.context.skin_type}, product_type={self.context.product_type}, ingredient_filter={self.context.ingredient_filter}, price_filter={self.context.price_filter}")
             
             # Deteksi pertanyaan follow-up yang lebih natural
             is_follow_up = (

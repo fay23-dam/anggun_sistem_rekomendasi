@@ -684,9 +684,9 @@
   "nama": "GARNIER BRIGHT COMPLETE VITAMIN C 30X BOOSTER SERUM",
   "harga": " 95.000",
   "tipe produk": "serum",
-  "jenis kulit": "berminyak",
-  "informasi produk": "garnier bright complete vitamin c 30x booster serum adalah serum untuk mencerahkan wajah yang mampu hilangkan jerawat dengan kadar vitamin c tertinggi. cara mencerahkan wajah yang efektif dengan 30x vitamin c.",
-  "kandungan": [
+  "tipe kulit": "berminyak",
+  "deskripsi": "garnier bright complete vitamin c 30x booster serum adalah serum untuk mencerahkan wajah yang mampu hilangkan jerawat dengan kadar vitamin c tertinggi. cara mencerahkan wajah yang efektif dengan 30x vitamin c.",
+  "ingredients": [
     "aqua / water", 
     "glycerin", 
     "niacinamide", 
@@ -714,7 +714,7 @@
     "xanthan gum", 
     "parfum/fragrance"
   ],
-  "cara pemakaian": [
+  "cara_pakai": [
     "aplikasikan secara merata pada area wajah dan leher di siang hari", 
     "pastikan wajah dalam keadaan bersih dan kering", 
     "gunakan 3-4 tetes untuk seluruh area wajah dan leher"
@@ -734,9 +734,9 @@
   "nama": "EMINA BRIGHT STUFF FOR ACNE PRONE SKIN 100ML ",
   "harga": "30.000",
   "tipe produk": "facial wash",
-  "jenis kulit": "berjerawat",
-  "informasi produk": "dikombinasikan dengan ekstrak cinnamon bark untuk kulit rentan berjerawat, kotoran dan minyak berlebih terangkat tanpa membuat kulitmu kering. kini kulitmu lebih bersih, cerah dan glowing. non-comedogenic. non-acnegenic.",
-  "kandungan": [
+  "tipe kulit": "berjerawat",
+  "deskripsi": "dikombinasikan dengan ekstrak cinnamon bark untuk kulit rentan berjerawat, kotoran dan minyak berlebih terangkat tanpa membuat kulitmu kering. kini kulitmu lebih bersih, cerah dan glowing. non-comedogenic. non-acnegenic.",
+  "ingredients": [
     "aqua", 
     "glycerin", 
     "myristic acid", 
@@ -765,7 +765,7 @@
     "cinnamomum zeylanicum bark extract", 
     "actinidia polygama fruit extract"
   ],
-  "cara pemakaian": [
+  "cara_pakai": [
     "tuangkan produk secukupnya, -beli di toko cozme ya kakak", 
     "basahi dengan air dan busakan di wajah", 
     "bilas dan keringkan", 
@@ -835,7 +835,7 @@
     ]
   },
   {
-    "nama": "Glad2Glow CENTELLA SALICYLIC ACID ACNE GEL CLEANSER",
+    "nama": "GLAD2GLOW CENTELLA SALICYLIC ACID ACNE GEL CLEANSER",
     "harga": "45.000",
     "tipe produk": "facial wash",
     "tipe kulit": "jerawat dan kemerahan",
@@ -2766,44 +2766,19 @@
     ]
   },
   {
-    "nama": "scarlett skin smoothing retinol serum",
-    "harga": "65.000",
-    "tipe produk": "serum",
-    "tipe kulit": "sensitif",
-    "deskripsi": "manfaat retinol mencegah tanda penuaan dan menyamarkan garis halus yang telah muncul meningkatkan proses regenerasi kulit.",
-    "ingredients": [
-      "retinol",
-      "hexapeptide-8",
-      "allantoin",
-      "pomegranate extract",
-      "vit c"
-    ],
-    "cara_pakai": "teteskan serum 2-3 tetes pada telapak tangan, oleskan secara perlahan dan merata ke seluruh kulit wajah, tunggu 1-3 menit hingga nama meresap sepenuhnya.",
-    "manfaat": [
-      "mencegah pertumbuhan bakteri penyebab jerawat",
-      "membantu mengurangi hiperpigmentasi",
-      "sehingga mencegah terjadinya tanda-tanda penuaan"
-    ],
-    "lokasi": [
-      "<iframe src=\"https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6306.062921335995!2d131.2933525!3d-0.8890661!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2d5955002729ea35%3A0xe5da40c5eeb10358!2sRAODAH%20BEAUTY%20CARE%20DAN%20BUTIK!5e1!3m2!1sid!2sid!4v1750089306785!5m2!1sid!2sid\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>",
-      "<iframe src=\"https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6306.064950250762!2d131.2886598!3d-0.8878774!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2d59550006b7e6ef%3A0xe8074b8cf9b35241!2sWcare%20II!5e1!3m2!1sid!2sid!4v1750089516689!5m2!1sid!2sid\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>",
-      "<iframe src=\"https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3153.036453723681!2d131.280065!3d-0.8831999999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMMKwNTInNTkuNSJTIDEzMcKwMTYnNDguMiJF!5e1!3m2!1sid!2sid!4v1750089534117!5m2!1sid!2sid\" width=\"600\" height=\"450\" style=\"border:0;\" allowfullscreen=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer-when-downgrade\"></iframe>"
-    ]
-  },
-  {
   "nama": "SCARLETT SKIN SMOOTHING RETINOL SERUM",
   "harga": " 65.000",
   "tipe produk": "serum",
-  "jenis kulit": "sensitif",
-  "informasi produk": "manfaat retinolmencegah tanda penuaan dan menyamarkan garis halus yang telah muncul meningkatkan proses regenerasi kulit sehingga sel kulit mati terangkat dan kulit terlihat lebih cerah serta halusmembantu menyamarkan tampilan pon-porbesarmembantu meningkatkan produksi kolagen dan elastin sehingga kulit terasa lebih kenyalhexapeptide-8membantu meremajakan kulit dan mengurangi tanda-tanda penuaan seperti garis halus dan keriputmembantu meningkatkan hidrasi kulit membantu menenangkan iritasi pada kulitmembantu meningkatkan produksi natural hyaluronic acid dan kolagen pada kulitallantoin membantu menghidrasi kulitmempercepat penyembuhan lukamenghaluskan tekstur kulitpomegranate extract kaya akan vitamin c sebagai antioksidan sehingga mampu mencegah kerusakan kulit akibat efek negatif radikal bebas dan paparan sinar mataharimengurangi tanda-tanda penuaan pada kulitmeningkatkan proses regenerasi kulit sehingga kulit nampak lebih halus dan cerahberfungsi sebagai anti-bacterial, mencerahkan kulit dan memudarkan flek hitam mencegah penurunan produksi kolagen sehingga dapat mencegah , vitamin c sebagai antioksidan mampu mencegah efek buruk radikal bebas pada kulit",
-  "kandungan": [
+  "tipe kulit": "sensitif",
+  "deskripsi": "manfaat retinolmencegah tanda penuaan dan menyamarkan garis halus yang telah muncul meningkatkan proses regenerasi kulit sehingga sel kulit mati terangkat dan kulit terlihat lebih cerah serta halusmembantu menyamarkan tampilan pon-porbesarmembantu meningkatkan produksi kolagen dan elastin sehingga kulit terasa lebih kenyalhexapeptide-8membantu meremajakan kulit dan mengurangi tanda-tanda penuaan seperti garis halus dan keriputmembantu meningkatkan hidrasi kulit membantu menenangkan iritasi pada kulitmembantu meningkatkan produksi natural hyaluronic acid dan kolagen pada kulitallantoin membantu menghidrasi kulitmempercepat penyembuhan lukamenghaluskan tekstur kulitpomegranate extract kaya akan vitamin c sebagai antioksidan sehingga mampu mencegah kerusakan kulit akibat efek negatif radikal bebas dan paparan sinar mataharimengurangi tanda-tanda penuaan pada kulitmeningkatkan proses regenerasi kulit sehingga kulit nampak lebih halus dan cerahberfungsi sebagai anti-bacterial, mencerahkan kulit dan memudarkan flek hitam mencegah penurunan produksi kolagen sehingga dapat mencegah , vitamin c sebagai antioksidan mampu mencegah efek buruk radikal bebas pada kulit",
+  "ingredients": [
     "retinol",
     "hexapeptide-8",
     "allantoin",
     "pomegranate extract",
     "vit c"
   ],
-  "cara pemakaian": [
+  "cara_pakai": [
     "teteskan serum 2-3 tetes pada telapak tangan",
     "oleskan secara perlahan dan merata ke seluruh kulit wajah",
     "tunggu 1-3 menit hingga produk meresap sepenuhnya"
@@ -3018,15 +2993,15 @@
   "nama": "NPURE CICA BIOME ACNE SERUM ESSENCE",
   "harga": " 100.000",
   "tipe produk": "serum",
-  "jenis kulit": "jerawat",
-  "informasi produk": "meredakan jerawat & memperbaiki tekstur kulit hanya dalam 28 hari. dilengkapi dengan teknologi terbaru yaitu dendricleartm - acne biome technology yang terbukti efektif mengatasi jerawat di wajah. diperkaya dengan 8 anti-acne plant extracts yang memberikan efek soothing & calming, membantu menenangkan kulit kemerahan, dan menyamarkan noda hitam akibat jerawat. formulanya yang ph balance (seimbang dengan ph kulit) dan diperkaya dengan cica madecassoside cocok untuk kulit sensitif dan berjerawat, mengatasi kemerahan, dan memperbaiki tekstur kulit berjerawat. kulit akan menjadi halus dan tampak lebih cerah.",
-  "kandungan": [
+  "tipe kulit": "jerawat",
+  "deskripsi": "meredakan jerawat & memperbaiki tekstur kulit hanya dalam 28 hari. dilengkapi dengan teknologi terbaru yaitu dendricleartm - acne biome technology yang terbukti efektif mengatasi jerawat di wajah. diperkaya dengan 8 anti-acne plant extracts yang memberikan efek soothing & calming, membantu menenangkan kulit kemerahan, dan menyamarkan noda hitam akibat jerawat. formulanya yang ph balance (seimbang dengan ph kulit) dan diperkaya dengan cica madecassoside cocok untuk kulit sensitif dan berjerawat, mengatasi kemerahan, dan memperbaiki tekstur kulit berjerawat. kulit akan menjadi halus dan tampak lebih cerah.",
+  "ingredients": [
     "dendriclear tm - acne biome technology",
     "8 anti-acne extracts (cica madecassoside, citrus unshiu peel extract, citrus junos seed extract, actinidia chinensis seed extract, strawberry fruit extract, vitis vinifera leaf extract, vitis vinifera seed & skin extract, garcinia mangostana peel extract)",
     "salicylic acid",
     "niacinamide"
   ],
-  "cara pemakaian": [
+  "cara_pakai": [
     "teteskan secukupnya, usap perlahan ke wajah sambil memberikan pijatan yang lembut.",
     "dapat digunakan setiap hari, pada pagi dan malam hari.",
     "dapat digunakan mulai dari usia 14 tahun"
@@ -3159,9 +3134,9 @@
   "nama": "THE ORIGINOTE ACNE B5 SERUM",
   "harga": "60.000",
   "tipe produk": "serum",
-  "jenis kulit": "jerawat",
-  "informasi produk": "the originote acne b5 serum adalah acne serum yang diformulasikan dengan gabungan bahan aktif laboratorium kimia yang teruji secara klinis aman dan bahan natural dari alam. diformulasikan dengan salicylic acid khusus untuk mengatasi jerawat dan mengecilkan pori-pori penyebab minyak berlebih, panthenol untuk tetap menjaga kelembaban kulit, dan tamanu oil mempercepat proses penyembuhan jerawat, mengurangi bekas jerawat",
-  "kandungan": [
+  "tipe kulit": "jerawat",
+  "deskripsi": "the originote acne b5 serum adalah acne serum yang diformulasikan dengan gabungan bahan aktif laboratorium kimia yang teruji secara klinis aman dan bahan natural dari alam. diformulasikan dengan salicylic acid khusus untuk mengatasi jerawat dan mengecilkan pori-pori penyebab minyak berlebih, panthenol untuk tetap menjaga kelembaban kulit, dan tamanu oil mempercepat proses penyembuhan jerawat, mengurangi bekas jerawat",
+  "ingredients": [
     "water",
     "butylene glycol",
     "glycerin",
@@ -3188,7 +3163,7 @@
     "artemisia argyi leaf extract",
     "calophyllum inophyllum seed oil"
   ],
-  "cara pemakaian": [
+  "cara_pakai": [
     "teteskan 2-3 tetes serum pada tangan lalu aplikasikan secara merata pada wajah dan leher yang sudah bersih",
     "tepuk wajah secara lembut. biarkan serum menyerap secara sempurna sebelum menggunakan produk skincare lainnya"
   ],
@@ -3339,12 +3314,12 @@
     ]
   },
   {
-    "produk": "THE ORIGINOTE CERATIDES BARRIER SERUM",
+    "nama": "THE ORIGINOTE CERATIDES BARRIER SERUM",
     "harga": "60.000",
-    "type_produk": "serum",
-    "jenis_kulit": "kering/ sensitif",
-    "informasi_produk": "serum yang diformulasikan untuk menjaga skin barrier dengan menggunakan gabungan dari bahan aktif laboratorium kimia yang teruji secara klinis aman dan bahan natural dari alam. diformulasikan dengan ceramide dan duo peptides yang dapat memperbaiki dan menjaga skin barrier, mengunci hidrasi pada kulit, menjaga elastisitas kulit serta membantu menyembuhkan breakout. mengandung propolis yang berfungsi sebagai anti-inflammatory yang dapat mengurangi kemerahan, dan melindungi kulit dari polusi, radiasi, dan bahaya sinar matahari. serum ceratides ini dapat dikombinasikan dengan semua produk serum the originote lainnya untuk memperkuat dan memperbaiki skin barrier.",
-    "kandungan": [
+    "tipe produk": "serum",
+    "tipe kulit": "kering/ sensitif",
+    "deskripsi": "serum yang diformulasikan untuk menjaga skin barrier dengan menggunakan gabungan dari bahan aktif laboratorium kimia yang teruji secara klinis aman dan bahan natural dari alam. diformulasikan dengan ceramide dan duo peptides yang dapat memperbaiki dan menjaga skin barrier, mengunci hidrasi pada kulit, menjaga elastisitas kulit serta membantu menyembuhkan breakout. mengandung propolis yang berfungsi sebagai anti-inflammatory yang dapat mengurangi kemerahan, dan melindungi kulit dari polusi, radiasi, dan bahaya sinar matahari. serum ceratides ini dapat dikombinasikan dengan semua produk serum the originote lainnya untuk memperkuat dan memperbaiki skin barrier.",
+    "ingredients": [
       "water",
       "butylene glycol",
       "glycerin",
@@ -3374,7 +3349,7 @@
       "cholesterol",
       "ceramide"
     ],
-    "cara_pemakaian": [
+    "cara_pakai": [
       "teteskan 2-3 tetes serum pada tangan lalu aplikasikan secara merata pada wajah dan leher yang sudah bersih",
       "tepuk wajah secara lembut.biarkan serum menyerap secara sempurna"
     ],
@@ -3389,12 +3364,12 @@
     ]
   },
   {
-    "produk": "THE ORIGINOTE PEELING SOLUTION SERUM EKSFLOIASI",
+    "nama": "THE ORIGINOTE PEELING SOLUTION SERUM EKSFLOIASI",
     "harga": "60.000",
-    "type_produk": "serum",
-    "jenis_kulit": "normal",
-    "informasi_produk": "cairan eksfoliasi yang diformulasikan dengan aha, bha, pha dan sugar cane yang berfungsi untuk mengangkat sel kulit mati, serta merawat keremajaan kulit sehingga kulit terlihat lebih cerah.",
-    "kandungan": [
+    "tipe produk": "serum",
+    "tipe kulit": "normal",
+    "deskripsi": "cairan eksfoliasi yang diformulasikan dengan aha, bha, pha dan sugar cane yang berfungsi untuk mengangkat sel kulit mati, serta merawat keremajaan kulit sehingga kulit terlihat lebih cerah.",
+    "ingredients": [
       "water",
       "glycerin",
       "glycolic acid",
@@ -3424,7 +3399,7 @@
       "saccharum officinarum (sugar cane) extract",
       "camellia sinensis leaf extract"
     ],
-    "cara_pemakaian": [
+    "cara_pakai": [
       "setelah membersihkan wajah, teteskan 5-10 tetes secara merata ke wajah yang kering dan bersih",
       "hindari area sensitif. biarkan secara 10 menit dan bilas dengan air hangat",
       "lanjutkan dengan produk skincare lainnya. gunakan pada malam hari, 2-3 kali dalam seminggu"

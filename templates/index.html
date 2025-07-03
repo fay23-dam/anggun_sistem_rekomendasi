@@ -202,6 +202,233 @@
       transform: translateY(0);
     }
     
+   
+    /* Perbaikan untuk Modal Pedoman */
+    .guide-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: flex-start; /* Diubah dari center ke flex-start */
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      overflow-y: auto; /* Tambahkan scroll jika konten panjang */
+    }
+    
+    .guide-modal-content {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      margin: 2rem 0; /* Beri margin atas bawah */
+    }
+    
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      background: rgba(248, 168, 216, 0.1);
+    }
+    .guide-step:hover {
+      background: rgba(248, 168, 216, 0.2);
+      transform: translateX(5px);
+    }
+    .step-number {
+      min-width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    /* ANIMASI PESAN BARU */
+    .message-container {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .message-container.user {
+      transform-origin: right bottom;
+    }
+    
+    .message-container.bot {
+      transform-origin: left bottom;
+    }
+    
+    .message-container.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+/* Style untuk tombol feedback */
+.feedback-buttons {
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.feedback-btn {
+     padding: 12px 25px;
+     border-radius: 16px;;
+     font-weight: 500;
+     display: flex;
+     align-items: center;
+     transition: all 0.3s ease;
+     border: none;
+     cursor: pointer;
+     font-size: 15px;
+}
+
+.feedback-btn.more {
+    background: linear-gradient(135deg, #e546b5, #d434a5);
+    color: white;
+    box-shadow: 0 5px 15px rgba(229, 70, 181, 0.3);
+}
+
+.feedback-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(229, 70, 181, 0.4);
+}
+
+.feedback-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.feedback-note {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #666;
+}
+/* Styling untuk bagian "Produk Tidak Ditemukan" */
+.no-recommendation {  
+    overflow: hidden;
+    padding: 10px;
+    border-radius: 16px;
+    background: white;
+    text-align: center;
+}
+
+.floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+}
+
+.sad-icon {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(35deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+}
+
+.rag-response h5 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+
+.rag-response p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.suggestion-box {
+            background: linear-gradient(135deg, #fdf5ff, #f9f0ff);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #f0d9e9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .suggestion-box:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #e546b5, #f8a8d8);
+        }
+        
+        .suggestion-box h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #7d2249;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .suggestion-box h4 i {
+            margin-right: 10px;
+            color: #e546b5;
+        }
+        
+        .suggestion-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .suggestion-list li {
+            padding: 12px 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            border-left: 3px solid #f8a8d8;
+        }
+        
+        .suggestion-list li:hover {
+            transform: translateX(5px);
+            border-left: 3px solid #e546b5;
+            box-shadow: 0 5px 15px rgba(229, 70, 181, 0.1);
+        }
+        
+        .suggestion-list li i {
+            width: 28px;
+            height: 28px;
+            background: #ffd6f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #e546b5;
+            font-size: 14px;
+        }
+        
+        .timestamp {
+            color: #aaa;
+            font-size: 12px;
+            text-align: right;
+            padding: 10px 15px 5px;
+            border-top: 1px dashed #eee;
+            margin-top: 15px;
+        }
+
     @media (max-width: 640px) {
       .input-container {
         padding-left: 0.75rem;
@@ -222,18 +449,73 @@
         padding: 8px 16px;
         font-size: 13px;
       }
+      
+       .guide-modal-content {
+        width: 90%;
+      }
+      
+      .guide-step {
+        flex-direction: column;
+      }
+      
+      .step-number {
+        margin-bottom: 10px;
+      }
+      
+      .location-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .location-tabs button {
+        width: 100%;
+        text-align: center;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+      }
+      
+      .modal-content, .guide-modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+      }
+      
+      .guide-modal {
+        align-items: flex-start;
+        padding-top: 1rem;
+      }
+      
+      .modal-image-container {
+        padding: 10px;
+      }
+      
+      #modalLocation {
+        height: 200px;
+      }
     }
+    
+    /* Perbaikan scroll modal */
+    .modal-content, .guide-modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
   </style>
 </head>
-<body class="bg-[#fff9fc] h-screen flex flex-col font-sans">
+<body class="bg-[#fff9fc] h-screen flex flex-col font-sans selection:bg-pink-200 selection:text-pink-900">
 
   <!-- Header with Gradient -->
   <header class="app-header text-white p-4">
-    <div class="container mx-auto flex items-center space-x-3">
-      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shadow-sm">
-        <i class="fas fa-spa text-white text-xl"></i>
+    <div class="container mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shadow-sm">
+          <i class="fas fa-spa text-white text-xl"></i>
+        </div>
+        <h1 class="text-white text-2xl font-bold">Asisten Virtual</h1>
       </div>
-      <h1 class="text-white text-2xl font-bold">Asisten Virtual <sup class="text-pink-200">💗</sup></h1>
+      <button id="guideButton" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-full flex items-center space-x-2 transition">
+        <i class="fas fa-book"></i>
+        <span>Pedoman</span>
+      </button>
     </div>
   </header>
   
@@ -241,19 +523,34 @@
   <div class="flex-1 overflow-y-auto p-4 chat-container" id="chatContainer">
     <div class="container mx-auto max-w-3xl space-y-4" id="chatMessages">
       <!-- Welcome Message -->
-      <div class="flex justify-start">
-        <div class="flex items-end space-x-3">
-          <div class="bot-message-bubble px-5 py-3">
-            <p class="text-gray-800 text-justify">Hello! 👋 Saya asisten rekomendasi skincare. Tanya saya tentang produk facial wash, sunscreen, serum, dan moisturizer yang cocok untuk Anda.</p>
-            <p class="text-gray-800 text-justify"><br />contoh : serum untuk kulit kering, atau manfaat GARNIER SAKURA GLOW GLOWING FACE WASH.</p>
-          </div>
-        </div>
+      <div class="flex items-end space-x-3">
+  <div class="bot-message-bubble px-5 py-4 relative">
+    <!-- Decorative elements -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden rounded-2xl opacity-10 pointer-events-none">
+      <div class="absolute -top-2 -left-2 w-16 h-16 rounded-full bg-pink-200"></div>
+      <div class="absolute -bottom-4 -right-4 w-24 h-24 rounded-full bg-purple-200"></div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="relative z-10">
+      <p class="font-bold text-[#e546b5] text-lg mb-3">Hello! 👋</p>
+      <p class="text-gray-700 mb-4">Saya asisten rekomendasi skincare yang akan membantu Anda menemukan produk terbaik untuk kebutuhan kulit Anda.</p>
+      
+      <div class=" border-l-4 border-pink-300 p-3 rounded-r-lg mb-4">
+        <p class="font-bold text-[#e546b5] mb-1">Kamu bisa bertanya sepert ini:</p>
+        <ul role="list" class="list-disc marker:text-pink-400 list-inside text-gray-900 text-sm mt-1 space-y-1">
+          <li>Serum untuk kulit kering</li>
+          <li>Manfaat GARNIER SAKURA GLOW FACE WASH</li>
+        </ul>
       </div>
+    </div>
+  </div>
+</div>
     </div>
   </div>
   
   <!-- Input Area -->
-  <div class="p-4 input-container bg-white/50 backdrop-blur-sm">
+  <div class="pb-4 sm:pb-24 lg:pb-4 input-container backdrop-blur-sm">
     <div class="container mx-auto max-w-3xl">
       <form id="chatForm" class="flex items-center gap-3 w-full">
         <input id="userInput" 
@@ -273,7 +570,7 @@
   </div>
   
   <!-- Scroll Up and Down Buttons -->
-  <div class="fixed bottom-8 right-4 flex flex-col gap-2">
+  <div class="fixed bottom-24 right-4 flex flex-col gap-2">
     <button id="scrollUpButton" class="scroll-button p-2 rounded-full bg-[#e546b5] text-white shadow-lg hover:bg-[#f8a8d8]">
       <i class="fas fa-arrow-up"></i>
     </button>
@@ -282,63 +579,64 @@
     </button>
   </div>
   
- <!-- Modal Produk -->
-<div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 product-modal">
-  <div class="modal-content rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 id="modalProductName" class="text-2xl font-bold text-[#3a0e2a]"></h2>
-        <button id="closeModal" class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition">
-          <i class="fas fa-times text-lg"></i>
-        </button>
-      </div>
-      
-      <div class="grid grid-cols-1 gap-6">
-        <div class="modal-image-container p-6 rounded-xl">
-          <img id="modalProductImage" src="" alt="Product" class="rounded-lg w-full max-h-64 object-contain mx-auto">
+  <!-- Modal Produk -->
+  <div id="productModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 product-modal">
+    <div class="modal-content rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modalProductName" class="text-2xl font-bold text-[#3a0e2a]"></h2>
+          <button id="closeModal" class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition">
+            <i class="fas fa-times text-lg"></i>
+          </button>
         </div>
         
-        <div class="space-y-5">
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Tipe Produk:</span>
-            <p id="modalProductType" class="mt-1 text-gray-700 text-lg"></p>
-          </div>
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Ingredients:</span>
-            <p id="modalIngredients" class="mt-1 text-gray-600 text-sm text-justifyleading-relaxed"></p>
-          </div>
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Deskripsi:</span>
-            <p id="modalDescription" class="mt-1 text-gray-700 text-justify"></p>
-          </div>
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Harga:</span>
-            <p id="modalPrice" class="mt-1 text-xl font-bold text-[#e546b5]"></p>
-          </div>
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Tipe Kulit:</span>
-            <p id="modalSkinType" class="mt-1 text-gray-700 text-lg"></p>
-          </div>
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Manfaat:</span>
-            <p id="modalManfaat" class="mt-1 text-gray-700 text-justifytext-lg"></p>
-          </div>
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Cara Pakai:</span>
-            <p id="modalCaraPakai" class="mt-1 text-gray-700 text-lg text-justify"></p>
+        <div class="grid grid-cols-1 gap-6">
+          <div class="modal-image-container p-6 rounded-xl">
+            <img id="modalProductImage" src="" alt="Product" class="rounded-lg w-full max-h-64 object-contain mx-auto">
           </div>
           
-          <!-- Location Section -->
-          <div>
-            <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Lokasi:</span>
-            <div class="mt-2">
-              <div class="flex space-x-2 mb-4">
-                <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="0">Lokasi Raodah Beauty</button>
-                <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="1">Lokasi Wcare</button>
-                <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="2">Lokasi FLBeauty</button>
-              </div>
-              <div id="modalLocation" class="w-full h-64 rounded-lg overflow-hidden">
-                <!-- Location iframe will be inserted here -->
+          <div class="space-y-5">
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Tipe Produk:</span>
+              <p id="modalProductType" class="mt-1 text-gray-700 text-lg"></p>
+            </div>
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Ingredients:</span>
+              <p id="modalIngredients" class="mt-1 text-gray-600 text-sm text-justifyleading-relaxed"></p>
+            </div>
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Deskripsi:</span>
+              <p id="modalDescription" class="mt-1 text-gray-700 text-justify"></p>
+            </div>
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Harga:</span>
+              <p id="modalPrice" class="mt-1 text-xl font-bold text-[#e546b5]"></p>
+            </div>
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Tipe Kulit:</span>
+              <p id="modalSkinType" class="mt-1 text-gray-700 text-lg"></p>
+            </div>
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Manfaat:</span>
+              <p id="modalManfaat" class="mt-1 text-gray-700 text-justifytext-lg"></p>
+            </div>
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Cara Pakai:</span>
+              <p id="modalCaraPakai" class="mt-1 text-gray-700 text-lg text-justify"></p>
+            </div>
+            
+            <!-- Location Section -->
+            <div>
+              <span class="font-semibold text-[#e546b5] text-sm uppercase tracking-wider">Lokasi:</span>
+              <div class="mt-2">
+                <div class="flex space-x-2 mb-4">
+                  <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="0">Lokasi Raodah Beauty</button>
+                  <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="1">Lokasi Wcare</button>
+                  <button class="location-tab px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-[#e546b5] hover:text-white transition" data-location-index="2">Lokasi FLBeauty</button>
+                </div>
+                <div id="modalLocation" class="w-full h-64 rounded-lg overflow-hidden">
+                  <!-- Location iframe will be inserted here -->
+                </div>
               </div>
             </div>
           </div>
@@ -346,12 +644,185 @@
       </div>
     </div>
   </div>
+  
+  <!-- Modal Pedoman -->
+  <div id="guideModal" class="guide-modal">
+    <div class="guide-modal-content">
+      <div class="bg-gradient-to-r from-[#e546b5] to-[#f8a8d8] p-5 rounded-t-2xl">
+        <div class="flex justify-between items-center">
+          <h2 class="text-white text-2xl font-bold"><i class="fas fa-book mr-2"></i> Pedoman Penggunaan</h2>
+          <button id="closeGuideModal" class="text-white hover:text-gray-200 p-2 rounded-full">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6 bg-white">
+        <div class="mb-8">
+          <h3 class="text-lg font-bold text-[#3a0e2a] mb-4">Cara Menggunakan Asisten Virtual Skincare</h3>
+          <p class="text-gray-600 mb-5">Berikut panduan lengkap untuk memanfaatkan asisten virtual dengan maksimal:</p>
+          
+          <div class="space-y-5">
+            <div class="guide-step">
+              <div class="step-number">1</div>
+              <div>
+                <h4 class="font-bold text-[#e546b5] mb-1">Mulai Percakapan</h4>
+                <p class="text-gray-700">Ketik pertanyaan di kolom input di bagian bawah halaman. Contoh: "Saya punya kulit berminyak, facial wash apa yang cocok?"</p>
+              </div>
+            </div>
+            
+            <div class="guide-step">
+              <div class="step-number">2</div>
+              <div>
+                <h4 class="font-bold text-[#e546b5] mb-1">Tanya Tentang Produk</h4>
+                <p class="text-gray-700">Anda bisa menanyakan informasi tentang produk seperti manfaat, kandungan, harga, atau cara pakai. Contoh: "Manfaat GARNIER SAKURA GLOW GLOWING FACE WASH?"</p>
+              </div>
+            </div>
+            
+            <div class="guide-step">
+              <div class="step-number">3</div>
+              <div>
+                <h4 class="font-bold text-[#e546b5] mb-1">Dapatkan Rekomendasi</h4>
+                <p class="text-gray-700">Asisten akan memberikan rekomendasi produk berdasarkan tipe kulit, masalah kulit, atau preferensi Anda. Contoh: "Rekomendasi serum untuk kulit kering"</p>
+              </div>
+            </div>
+            
+            <div class="guide-step">
+              <div class="step-number">4</div>
+              <div>
+                <h4 class="font-bold text-[#e546b5] mb-1">Lihat Detail Produk</h4>
+                <p class="text-gray-700">Klik tombol "Detail" pada kartu produk untuk melihat informasi lengkap termasuk lokasi penjualan.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-[#fff9fc] p-4 rounded-xl border border-[#ffd6f0]">
+  <h4 class="font-bold text-[#e546b5] mb-2 flex items-center">
+    <i class="fas fa-lightbulb mr-2"></i> Contoh Pertanyaan
+  </h4>
+  <div class="copy-question-button grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div class="bg-white p-3 rounded-lg border border-[#f8a8d8] cursor-pointer hover:bg-[#f8a8d8]/20 question" data-question="Sunscreen untuk kulit sensitif">
+      <p class="text-gray-700">"Sunscreen untuk kulit sensitif"</p>
+    </div>
+    <div class="copy-question-button bg-white p-3 rounded-lg border border-[#f8a8d8] cursor-pointer hover:bg-[#f8a8d8]/20 question" data-question="Moisturizer untuk kulit jerawat dengan harga di bawah 100 ribu">
+      <p class="text-gray-700">"Moisturizer untuk kulit jerawat dengan harga di bawah 100 ribu"</p>
+    </div>
+    <div class="copy-question-button bg-white p-3 rounded-lg border border-[#f8a8d8] cursor-pointer hover:bg-[#f8a8d8]/20 question" data-question="Serum untuk kulit kering yang mengandung niacinamide">
+      <p class="text-gray-700">"Serum untuk kulit kering yang mengandung niacinamide"</p>
+    </div>
+  </div>
 </div>
+
+      
+      <div class="bg-[#fff9fc] p-5 rounded-b-2xl text-center">
+        <button id="startChatButton" class="bg-gradient-to-r from-[#e546b5] to-[#f8a8d8] text-white px-6 py-3 rounded-full font-medium hover:opacity-90 transition">
+          Mulai Chat Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
   
   <!-- Color Gradient Bar -->
   <div class="color-gradient-bar"></div>
 
   <script>
+    // Menambahkan event listener pada div yang berisi pertanyaan
+document.querySelectorAll('.question').forEach(function(item) {
+  item.addEventListener('click', function() {
+    // Get the question text from the clicked element
+    const questionText = item.getAttribute('data-question');
+    const cleanedText = questionText.replace(/"/g, '').trim();  // Clean up extra quotes if any
+    // Update the displayed question text
+    document.getElementById('userInput').value = cleanedText;
+    
+     const guideModal = document.getElementById('guideModal');
+    guideModal.style.display = 'none'; // Menutup modal dengan mengubah display ke 'none'
+    document.body.style.overflow = 'auto'; // Mengembalikan overflow ke normal setelah menutup modal
+  });
+});
+document.addEventListener('click', function(e) {
+    // Handle tombol rekomendasi lainnya
+    if (e.target.classList.contains('suggesst-one') || 
+       e.target.classList.contains('suggesst-two') || 
+       e.target.classList.contains('suggesst-three') || 
+       (e.target.classList.contains('feedback-btn') && e.target.dataset.feedback === 'more')) {
+        
+        // Sembunyikan semua tombol saran di pesan yang sama
+        const parentBubble = e.target.closest('.bot-message-bubble');
+        if (parentBubble) {
+            const suggestionButtons = parentBubble.querySelectorAll(
+                '.suggesst-one, .suggesst-two, .suggesst-three, .feedback-btn.more'
+            );
+            suggestionButtons.forEach(button => {
+                button.classList.add('cursor-not-allowed');
+            });
+        }
+
+        // Tentukan pertanyaan berdasarkan tombol yang ditekan
+        let question = "";
+        if (e.target.classList.contains('suggesst-one')) {
+            question = "Moisturizer untuk kulit sensitif";
+        } else if (e.target.classList.contains('suggesst-two')) {
+            question = "Sunscreen untuk kulit kering dibawah 100 ribu";
+        } else if (e.target.classList.contains('suggesst-three')) {
+            question = "manfaat garnier sakura glow glowing face wash";
+        } else {
+            question = "rekomendasi lainnya";
+        }
+
+        handleMoreRecommendations(question);
+    }
+    
+    // Handle feedback positif/negatif (opsional)
+    else if (e.target.classList.contains('feedback-btn')) {
+        handleFeedback(e.target.dataset.feedback);
+    }
+});
+
+// Fungsi untuk meminta rekomendasi lainnya
+async function handleMoreRecommendations(test) {
+    addMessage(test, 'user');
+    scrollToBottom();
+    isProcessing = true;
+    toggleButtonState(true);
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    addTyping();
+    
+    try {
+        const lastBotMessage = document.querySelector('.bot-message-bubble:last-child');
+        const context = lastBotMessage ? lastBotMessage.textContent.substring(0, 100) : '';
+        
+        const res = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                message: test,
+                context: context
+            })
+        });
+
+        const data = await res.json();
+        removeTyping();
+
+        if (data.status === 'success') {
+            const lastBotElement = document.querySelector('.flex.justify-start.mb-4:last-child');
+            if (lastBotElement) lastBotElement.remove();
+            addHtmlMessage(data.response);
+        } else {
+            addMessage('⚠️ ' + data.response, 'bot');
+        }
+    } catch (err) {
+        removeTyping();
+        addMessage('⚠️ Error memuat ' + test, 'bot');
+        console.error(err);
+    } finally {
+        isProcessing = false;
+        toggleButtonState(false);
+    }
+}
     function showProductDetail(productName) {
       fetch('../static/data.json')
         .then(response => response.json())
@@ -359,7 +830,11 @@
           const product = products.find(p => p.nama === productName);
           if (product) {
             document.getElementById('modalProductName').textContent = product.nama;
-            document.getElementById('modalProductImage').src = `static/data.1/${product.nama}.JPG`;
+            
+            // Encode nama produk untuk URL
+            const encodedProductName = encodeURIComponent(product.nama);
+            document.getElementById('modalProductImage').src = `static/data.1/${encodedProductName}.JPG`;
+            
             document.getElementById('modalProductType').textContent = product["tipe produk"] || 'N/A';
             
             const ingredients = product.ingredients ? 
@@ -411,7 +886,7 @@
           alert('Terjadi kesalahan saat memuat data produk');
         });
     }
-
+    
     // Add event listener for detail button
     document.addEventListener('click', function(e) {
       if (e.target.classList.contains('detail-btn')) {
@@ -429,6 +904,39 @@
       if (e.target === this) {
         this.classList.add('hidden');
       }
+    });
+
+    // Guide modal functionality
+    const guideButton = document.getElementById('guideButton');
+    const guideModal = document.getElementById('guideModal');
+    const closeGuideModal = document.getElementById('closeGuideModal');
+    const startChatButton = document.getElementById('startChatButton');
+
+    // Open guide modal
+    guideButton.addEventListener('click', () => {
+      guideModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    });
+
+    // Close guide modal
+    closeGuideModal.addEventListener('click', () => {
+      guideModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    });
+
+    // Close when clicking outside modal
+    guideModal.addEventListener('click', (e) => {
+      if (e.target === guideModal) {
+        guideModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // Start chat button in guide modal
+    startChatButton.addEventListener('click', () => {
+      guideModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+      userInput.focus();
     });
 
     // Chat functionality

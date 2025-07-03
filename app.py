@@ -140,6 +140,10 @@ def ask():
             result['response'] = response
             result['response_type'] = 'html'
             logger.info("Mengirim respons HTML")
+        elif 'div class="no-recommendation"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan rekomendasi")
         else:
             result['response'] = response
             result['response_type'] = 'text'
