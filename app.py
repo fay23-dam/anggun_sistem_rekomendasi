@@ -143,7 +143,50 @@ def ask():
         elif 'div class="no-recommendation"' in response:
             result['response'] = response
             result['response_type'] = 'html'
+        elif 'div class="no-product-response"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
             logger.info("Mengirim respons HTML dengan rekomendasi")
+        elif 'div class="rag-response"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan respons RAG")
+        elif 'div class="out-of-scope"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan out-of-scope")
+        elif 'div class="stat-response"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan statistik")
+        elif 'div class="stat-container"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan statistik")
+        elif 'div class="brand-response"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan statistik")
+        elif 'div class="clarification"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan klarifikasi")
+        elif 'div class="error-response"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan respons error")
+        elif 'div class="no-products"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan respons tidak ada produk")
+        elif 'div class="greeting"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan sapaan")
+        elif 'div class="identity"' in response:
+            result['response'] = response
+            result['response_type'] = 'html'
+            logger.info("Mengirim respons HTML dengan indetitas")
         else:
             result['response'] = response
             result['response_type'] = 'text'
